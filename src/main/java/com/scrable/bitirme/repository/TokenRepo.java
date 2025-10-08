@@ -8,17 +8,17 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface TokenRepository extends JpaRepository<Token,Long> {
+public interface TokenRepo extends JpaRepository<Token,Long> {
 
     @Query("""
 select t from Token t inner join Users u on t.users.id = u.id
 where t.users.id = :userId and t.loggedOut = false
 """)
-    List<Token> findAllAccessTokensByUser(Integer userId);
+    List<Token> findAllAccessTokensByUser(Long userId);
 
     Optional<Token> findByAccessToken(String token);
 
     Optional<Token > findByRefreshToken(String token);
 
-    void deleteByUserId(Integer userId);
+    void deleteByUserId(Long userId);
 }

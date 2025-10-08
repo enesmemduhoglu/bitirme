@@ -1,13 +1,12 @@
 package com.scrable.bitirme.service;
 
 import com.scrable.bitirme.model.Users;
-import com.scrable.bitirme.repository.TokenRepository;
+import com.scrable.bitirme.repository.TokenRepo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.token.TokenService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,7 @@ public class JwtService {
     private long accessTokenExpire = 86400000;
     private long refreshTokenExpire = 604800000;
 
-    private final TokenRepository tokenRepository;
+    private final TokenRepo tokenRepository;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

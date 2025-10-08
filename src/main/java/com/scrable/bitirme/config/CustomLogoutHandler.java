@@ -1,7 +1,7 @@
 package com.scrable.bitirme.config;
 
 import com.scrable.bitirme.model.Token;
-import com.scrable.bitirme.repository.TokenRepository;
+import com.scrable.bitirme.repository.TokenRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 @RequiredArgsConstructor
 public class CustomLogoutHandler implements LogoutHandler {
 
-    private final TokenRepository tokenRepository;
+    private final TokenRepo tokenRepository;
 
     @Override
     public void logout(HttpServletRequest request,
