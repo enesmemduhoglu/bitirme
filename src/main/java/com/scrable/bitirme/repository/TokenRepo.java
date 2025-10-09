@@ -20,5 +20,5 @@ where t.users.id = :userId and t.loggedOut = false
 
     Optional<Token > findByRefreshToken(String token);
 
-    void deleteByUserId(Long userId);
+    void deleteByUsersId(Long userId);
 }

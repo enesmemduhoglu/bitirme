@@ -45,7 +45,7 @@ public class UsersService {
             throw new UserNotFoundException("User not found with id: " + id);
         }
 
-        tokenRepo.deleteByUserId(id);
+        tokenRepo.deleteByUsersId(id);
         usersRepo.deleteById(id);
     }
 
