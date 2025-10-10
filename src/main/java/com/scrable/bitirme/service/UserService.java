@@ -1,11 +1,11 @@
 package com.scrable.bitirme.service;
 
-import com.scrable.bitirme.dto.UsersDto;
-import com.scrable.bitirme.dto.UsersDtoMapper;
+import com.scrable.bitirme.dto.UserDto;
+import com.scrable.bitirme.dto.UserDtoMapper;
 import com.scrable.bitirme.exception.UserNotFoundException;
-import com.scrable.bitirme.model.Users;
+import com.scrable.bitirme.model.User;
 import com.scrable.bitirme.repository.TokenRepo;
-import com.scrable.bitirme.repository.UsersRepo;
+import com.scrable.bitirme.repository.UserRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,42 +15,42 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UsersService {
+public class UserService {
 
-    private final UsersRepo usersRepo;
+    private final UserRepo userRepo;
     private final TokenRepo tokenRepo;
-    private final UsersDtoMapper usersDtoMapper;
+    private final UserDtoMapper userDtoMapper;
 
-    public List<UsersDto> getAllUsers() {
-        return usersRepo.findAll()
+    public List<UserDto> getAllUsers() {
+        return userRepo.findAll()
                 .stream()
-                .map(usersDtoMapper::toDto)
+                .map(userDtoMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public UsersDto updateUser(Long id, UsersDto updateUserDto) {
-        Users existingUser = usersRepo.findById(id)
+    public UserDto updateUser(Long id, UserDto updateUserDto) {
+        User existingUser = userRepo.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
-        usersDtoMapper.updateUserFromDto(updateUserDto, existingUser);
-        Users updatedUser = usersRepo.save(existingUser);
+        userDtoMapper.updateUserFromDto(updateUserDto, existingUser);
+        User updatedUser = userRepo.save(existingUser);
 
-        return usersDtoMapper.toDto(updatedUser);
+        return userDtoMapper.toDto(updatedUser);
     }
 
     @Transactional
     public void deleteUser(Long id) {
-        if (!usersRepo.existsById(id)) {
+        if (!userRepo.existsById(id)) {
             throw new UserNotFoundException("User not found with id: " + id);
         }
 
-        tokenRepo.deleteByUsersId(id);
-        usersRepo.deleteById(id);
+        tokenRepo.deleteByUserId(id);
+        userRepo.deleteById(id);
     }
 
     public String verifyUser(String verificationCode) {
-        Users user = usersRepo.findByVerificationCode(verificationCode)
+        User user = userRepo.findByVerificationCode(verificationCode)
                 .orElseThrow(() -> new UserNotFoundException("Invalid verification code."));
 
         if (user.isEnabled()) {
@@ -59,7 +59,7 @@ public class UsersService {
 
         user.setEnabled(true);
         user.setVerificationCode(null);
-        usersRepo.save(user);
+        userRepo.save(user);
 
         return "Account verified successfully.";
     }

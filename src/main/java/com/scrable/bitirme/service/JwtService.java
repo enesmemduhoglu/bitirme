@@ -1,12 +1,13 @@
 package com.scrable.bitirme.service;
 
-import com.scrable.bitirme.model.Users;
+import com.scrable.bitirme.model.User;
 import com.scrable.bitirme.repository.TokenRepo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,8 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtService {
 
-    private String secretKey = "c85e008bbb66a52d66641b0ed2e8d019368929c9458d76ea1d54f9e43d14b958";
+    @Value("${JWT_SECRET_KEY}")
+    private String secretKey;
     private long accessTokenExpire = 86400000;
     private long refreshTokenExpire = 604800000;
 
@@ -40,7 +42,7 @@ public class JwtService {
         return (username.equals(user.getUsername())) && !isTokenExpired(token) && validToken;
     }
 
-    public boolean isValidRefreshToken(String token, Users user) {
+    public boolean isValidRefreshToken(String token, User user) {
         String username = extractUsername(token);
 
         boolean validRefreshToken = tokenRepository
@@ -74,15 +76,15 @@ public class JwtService {
     }
 
 
-    public String generateAccessToken(Users user) {
+    public String generateAccessToken(User user) {
         return generateToken(user, accessTokenExpire);
     }
 
-    public String generateRefreshToken(Users user) {
+    public String generateRefreshToken(User user) {
         return generateToken(user, refreshTokenExpire );
     }
 
-    private String generateToken(Users user, long expireTime) {
+    private String generateToken(User user, long expireTime) {
         String token = Jwts
                 .builder()
                 .subject(user.getUsername())

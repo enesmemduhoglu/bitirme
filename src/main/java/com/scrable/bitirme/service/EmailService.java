@@ -1,6 +1,6 @@
 package com.scrable.bitirme.service;
 
-import com.scrable.bitirme.model.Users;
+import com.scrable.bitirme.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -12,7 +12,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    public void sendVerificationEmail(Users user) {
+    public void sendVerificationEmail(User user) {
         String subject = "Email Verification";
         String verificationUrl = "http://localhost:8080/verify?code=" + user.getVerificationCode();
         String message = "Please verify your email by clicking the following link: " + verificationUrl;

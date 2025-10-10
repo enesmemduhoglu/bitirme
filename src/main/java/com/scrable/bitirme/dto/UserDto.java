@@ -3,13 +3,12 @@ package com.scrable.bitirme.dto;
 import com.scrable.bitirme.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-public class UsersDto {
+public class UserDto {
     private Long id;
     private String firstName;
     private String lastName;

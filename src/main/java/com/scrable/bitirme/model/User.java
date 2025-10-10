@@ -15,7 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Users implements UserDetails {
+@Table(name = "user_tbl")
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,8 +40,11 @@ public class Users implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     private List<Token> tokens;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Cart> cartItems;
 
 
     @Override

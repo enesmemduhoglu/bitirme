@@ -3,11 +3,11 @@ package com.scrable.bitirme.service;
 import com.scrable.bitirme.model.AuthenticationResponse;
 import com.scrable.bitirme.model.Role;
 import com.scrable.bitirme.model.Token;
-import com.scrable.bitirme.model.Users;
+import com.scrable.bitirme.model.User;
 import com.scrable.bitirme.repository.TokenRepo;
 import com.scrable.bitirme.exception.EmailAlreadyExistsException;
 import com.scrable.bitirme.exception.UserNotVerifiedException;
-import com.scrable.bitirme.repository.UsersRepo;
+import com.scrable.bitirme.repository.UserRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ import static org.springframework.http.HttpStatus.*;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final UsersRepo usersRepo;
+    private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final TokenRepo tokenRepo;
@@ -39,12 +39,12 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
 
-    public ResponseEntity<String> register(Users request) {
-        if (usersRepo.findByUsername(request.getUsername()).isPresent()) {
+    public ResponseEntity<String> register(User request) {
+        if (userRepo.findByUsername(request.getUsername()).isPresent()) {
             throw new ResponseStatusException(CONFLICT, "Username already exists");
         }
 
-        if (usersRepo.findByEmail(request.getEmail()).isPresent()) {
+        if (userRepo.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email already registered");
         }
 
@@ -52,7 +52,7 @@ public class AuthenticationService {
             throw new ResponseStatusException(BAD_REQUEST, "Password must be at least 8 characters");
         }
 
-        Users user = new Users();
+        User user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setUsername(request.getUsername());
@@ -62,7 +62,7 @@ public class AuthenticationService {
         user.setEnabled(false);
         user.setVerificationCode(UUID.randomUUID().toString());
 
-        usersRepo.save(user);
+        userRepo.save(user);
 
         emailService.sendVerificationEmail(user);
 
@@ -72,18 +72,18 @@ public class AuthenticationService {
     }
 
 
-    public AuthenticationResponse authenticateUser(Users request) {
+    public AuthenticationResponse authenticateUser(User request) {
         return authenticate(request, Role.USER);
     }
 
 
-    public AuthenticationResponse authenticateAdmin(Users request) {
+    public AuthenticationResponse authenticateAdmin(User request) {
         return authenticate(request, Role.ADMIN);
     }
 
 
-    private AuthenticationResponse authenticate(Users request, Role expectedRole) {
-        Users user = usersRepo.findByUsername(request.getUsername())
+    private AuthenticationResponse authenticate(User request, Role expectedRole) {
+        User user = userRepo.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
 
         if (user.getRole() != expectedRole) {
@@ -134,7 +134,7 @@ public class AuthenticationService {
             throw new ResponseStatusException(UNAUTHORIZED, "Username not found in token");
         }
 
-        Users user = usersRepo.findByUsername(username)
+        User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "User not found"));
 
         if (!jwtService.isValidRefreshToken(refreshToken, user)) {
@@ -152,7 +152,7 @@ public class AuthenticationService {
     }
 
 
-    private void revokeAllTokensByUser(Users user) {
+    private void revokeAllTokensByUser(User user) {
         List<Token> validTokens = tokenRepo.findAllAccessTokensByUser(user.getId());
         if (validTokens.isEmpty()) return;
 
@@ -161,9 +161,9 @@ public class AuthenticationService {
     }
 
 
-    private void saveUserToken(Users user, String accessToken, String refreshToken) {
+    private void saveUserToken(User user, String accessToken, String refreshToken) {
         Token token = new Token();
-        token.setUsers(user);
+        token.setUser(user);
         token.setAccessToken(accessToken);
         token.setRefreshToken(refreshToken);
         token.setLoggedOut(false);
