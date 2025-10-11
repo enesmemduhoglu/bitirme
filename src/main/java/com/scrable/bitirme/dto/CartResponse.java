@@ -3,6 +3,8 @@ package com.scrable.bitirme.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 public class CartResponse {
@@ -12,6 +14,6 @@ public class CartResponse {
 
     private String productName;
     private String productImage;
-    private Double productPrice;
+    private BigDecimal productPrice;
     private String productDescription;
 }
