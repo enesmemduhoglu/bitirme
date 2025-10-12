@@ -15,8 +15,9 @@ public class ProductDtoMapper {
         productDto.setProductName(product.getProductName());
         productDto.setProductDescription(product.getProductDescription());
         productDto.setProductPrice(product.getProductPrice());
-        productDto.setProductStock(product.getProductStock());
+        productDto.setMaxQuantityPerCart(product.getMaxQuantityPerCart());
         productDto.setProductImage(product.getProductImage());
+        productDto.setProductStock(product.getProductStock());
 
         return productDto;
     }
@@ -31,8 +32,9 @@ public class ProductDtoMapper {
         product.setProductName(productDto.getProductName());
         product.setProductDescription(productDto.getProductDescription());
         product.setProductPrice(productDto.getProductPrice());
-        product.setProductStock(productDto.getProductStock());
+        product.setMaxQuantityPerCart(productDto.getMaxQuantityPerCart());
         product.setProductImage(productDto.getProductImage());
+        product.setProductStock(productDto.getProductStock());
 
         return product;
     }
@@ -51,11 +53,14 @@ public class ProductDtoMapper {
         if (productDto.getProductPrice() != null) {
             product.setProductPrice(productDto.getProductPrice());
         }
-        if (productDto.getProductStock() != null) {
-            product.setProductStock(productDto.getProductStock());
+        if (productDto.getMaxQuantityPerCart() != null) {
+            product.setMaxQuantityPerCart(productDto.getMaxQuantityPerCart());
         }
         if (productDto.getProductImage() != null) {
             product.setProductImage(productDto.getProductImage());
+        }
+        if (productDto.getProductStock() != null) {
+            product.setProductStock(productDto.getProductStock());
         }
     }
 }

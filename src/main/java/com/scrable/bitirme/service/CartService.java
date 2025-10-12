@@ -2,15 +2,16 @@ package com.scrable.bitirme.service;
 
 import com.scrable.bitirme.dto.CartRequest;
 import com.scrable.bitirme.dto.CartResponse;
+import com.scrable.bitirme.exception.CartLimitExceededException;
+import com.scrable.bitirme.exception.ProductNotFoundException;
+import com.scrable.bitirme.exception.UserNotFoundException;
 import com.scrable.bitirme.model.Cart;
 import com.scrable.bitirme.model.Product;
 import com.scrable.bitirme.model.User;
 import com.scrable.bitirme.repository.CartRepo;
 import com.scrable.bitirme.repository.ProductRepo;
 import com.scrable.bitirme.repository.UserRepo;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class CartService {
 
     public List<CartResponse> getCartByUserId(Long userId) {
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
         return cartRepo.findByUser(user)
                 .stream()
@@ -48,29 +49,37 @@ public class CartService {
     }
 
     public void addProductToCart(CartRequest cartRequest) {
-       User user = userRepo.findById(cartRequest.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepo.findById(cartRequest.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + cartRequest.getUserId()));
 
-       Product product = productRepo.findById(cartRequest.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+        Product product = productRepo.findById(cartRequest.getProductId())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + cartRequest.getProductId()));
 
         Optional<Cart> existingCartItem = cartRepo.findByUserAndProduct(user, product);
 
+        Integer maxQuantity = product.getMaxQuantityPerCart();
+
         if (existingCartItem.isPresent()) {
             Cart cartItem = existingCartItem.get();
-            cartItem.setQuantity(cartItem.getQuantity() + cartRequest.getQuantity());
+            int newQuantity = cartItem.getQuantity() + cartRequest.getQuantity();
+
+            if (maxQuantity != null && newQuantity > maxQuantity) {
+                throw new CartLimitExceededException("You can add a maximum of " + maxQuantity + " of this product to your cart.");
+            }
+
+            cartItem.setQuantity(newQuantity);
             cartRepo.save(cartItem);
         } else {
+            if (maxQuantity != null && cartRequest.getQuantity() > maxQuantity) {
+                throw new CartLimitExceededException("You can add a maximum of " + maxQuantity + " of this product to your cart.");
+            }
+
             Cart cartItem = new Cart();
             cartItem.setUser(user);
             cartItem.setProduct(product);
             cartItem.setQuantity(cartRequest.getQuantity());
             cartRepo.save(cartItem);
         }
-
     }
-
-
-
 
 }
