@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Setter
@@ -17,6 +19,7 @@ public class Product {
     private String productName;
     private String productDescription;
     private Double productPrice;
-    private Integer productStock;
     private String productImage;
+    private Integer MaxQuantityPerCart;
+    private Integer productStock;
 }
