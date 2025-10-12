@@ -1,5 +1,7 @@
 package com.scrable.bitirme.service;
 
+import com.scrable.bitirme.dto.OrderDto;
+import com.scrable.bitirme.dto.OrderDtoMapper;
 import com.scrable.bitirme.exception.InsufficientStockException;
 import com.scrable.bitirme.exception.UserNotFoundException;
 import com.scrable.bitirme.model.*;
@@ -24,6 +26,7 @@ public class OrderService {
     private final UserRepo userRepo;
     private final CartRepo cartRepo;
     private final ProductRepo productRepo;
+    private final OrderDtoMapper orderDtoMapper;
 
     @Transactional
     public Order createOrderFromCart(Long userId, String paymentIntentId) {
@@ -75,5 +78,16 @@ public class OrderService {
         cartRepo.deleteAll(cartItems);
 
         return savedOrder;
+    }
+
+    public List<OrderDto> getOrdersByUserId(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
+        List<Order> orders = orderRepo.findByUser(user);
+
+        return orders.stream()
+                .map(orderDtoMapper::convertToDto)
+                .collect(Collectors.toList());
     }
 }

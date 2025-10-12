@@ -22,12 +22,13 @@ import java.util.Collections;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/payments")
 public class PaymentController {
 
     private final PaymentService paymentService;
     private final OrderService orderService;
 
-    @PostMapping("/payments/create-payment-intent")
+    @PostMapping("/create-payment-intent")
     public ResponseEntity<?> createPaymentIntent(@RequestBody PaymentRequest paymentRequest) {
         try {
             PaymentIntent paymentIntent = paymentService.createPaymentIntent(paymentRequest.getUserId());
@@ -52,7 +53,7 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/payments/confirm-for-testing")
+    @PostMapping("/confirm-for-testing")
     public ResponseEntity<?> confirmPaymentForTesting(@RequestBody ConfirmPaymentRequest confirmPaymentRequest) {
         try {
             PaymentIntent paymentIntent = paymentService.confirmPaymentIntentForTesting(confirmPaymentRequest.getPaymentIntentId());
