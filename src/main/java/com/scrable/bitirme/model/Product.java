@@ -1,9 +1,6 @@
 package com.scrable.bitirme.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,8 +15,8 @@ public class Product {
     private Long productId;
     private String productName;
     private String productDescription;
-    private Double productPrice;
     private String productImage;
     private Integer MaxQuantityPerCart;
+    private BigDecimal productPrice;
     private Integer productStock;
 }

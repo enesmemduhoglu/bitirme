@@ -4,6 +4,7 @@ import com.scrable.bitirme.dto.AddToCartResponse;
 import com.scrable.bitirme.dto.CartRequest;
 import com.scrable.bitirme.dto.CartResponse;
 import com.scrable.bitirme.exception.OutOfStockException;
+import com.scrable.bitirme.exception.CartLimitExceededException;
 import com.scrable.bitirme.exception.ProductNotFoundException;
 import com.scrable.bitirme.exception.UserNotFoundException;
 import com.scrable.bitirme.model.Cart;
@@ -12,9 +13,7 @@ import com.scrable.bitirme.model.User;
 import com.scrable.bitirme.repository.CartRepo;
 import com.scrable.bitirme.repository.ProductRepo;
 import com.scrable.bitirme.repository.UserRepo;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +31,7 @@ public class CartService {
 
     public List<CartResponse> getCartByUserId(Long userId) {
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
         return cartRepo.findByUser(user)
                 .stream()
@@ -110,8 +109,5 @@ public class CartService {
 
         return new AddToCartResponse(message, actualQuantityAdded, product.getProductId());
     }
-
-
-
 
 }
