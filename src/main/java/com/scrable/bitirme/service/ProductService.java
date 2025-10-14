@@ -1,10 +1,12 @@
 package com.scrable.bitirme.service;
 
+import com.scrable.bitirme.dto.ProductDocumentMapper;
 import com.scrable.bitirme.dto.ProductDto;
 import com.scrable.bitirme.dto.ProductDtoMapper;
 import com.scrable.bitirme.exception.ProductNotFoundException;
 import com.scrable.bitirme.model.Product;
 import com.scrable.bitirme.repository.ProductRepo;
+import com.scrable.bitirme.repository.ProductSearchRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,10 @@ public class ProductService {
     private final ProductRepo productRepo;
     private final ProductDtoMapper productDtoMapper;
     private final FileStorageService fileStorageService;
+    private final ProductSearchRepo productSearchRepo;
+    private final ProductDocumentMapper productDocumentMapper;
 
+    @Transactional
     public ProductDto createProduct(ProductDto productDto, MultipartFile imageFile) {
         Product product = productDtoMapper.toEntity(productDto);
 
@@ -31,7 +36,8 @@ public class ProductService {
 
         Product savedProduct = productRepo.save(product);
 
-        // dto'ya dönüştürürken S3 URL'ini de oluşturur
+        productSearchRepo.save(productDocumentMapper.convertToDocument(savedProduct));
+
         ProductDto resultDto = productDtoMapper.toDto(savedProduct);
         resultDto.setProductImage(fileStorageService.generatePresignedUrl(savedProduct.getProductImage()));
 
@@ -43,7 +49,6 @@ public class ProductService {
                 .stream()
                 .map(product -> {
                     ProductDto dto = productDtoMapper.toDto(product);
-                    // Her ürün için s3'ten geçici url alır ve dto'ya atar
                     dto.setProductImage(fileStorageService.generatePresignedUrl(product.getProductImage()));
                     return dto;
                 })
@@ -70,6 +75,8 @@ public class ProductService {
 
         Product updatedProduct = productRepo.save(existingProduct);
 
+        productSearchRepo.save(productDocumentMapper.convertToDocument(updatedProduct));
+
         ProductDto resultDto = productDtoMapper.toDto(updatedProduct);
         resultDto.setProductImage(fileStorageService.generatePresignedUrl(updatedProduct.getProductImage()));
 
@@ -84,6 +91,8 @@ public class ProductService {
         String imageKey = productToDelete.getProductImage();
 
         productRepo.delete(productToDelete);
+
+        productSearchRepo.deleteById(id);
 
         if (imageKey != null) {
             fileStorageService.deleteFile(imageKey);
