@@ -33,6 +33,12 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
+    @GetMapping
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        List<ProductDto> products = productService.getProducts();
+        return ResponseEntity.ok(products);
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<ProductDto>> searchProducts(@RequestParam("q") String q) {
         List<ProductDto> products = searchService.searchProducts(q);

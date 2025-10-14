@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    container_name: bitirme
+    container_name: bitirme-postgre
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
@@ -25,6 +25,15 @@ services:
     volumes:
       - es-data:/usr/share/elasticsearch/data
 
+  redis:
+    image: redis:7-alpine
+    container_name: bitirme-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
 volumes:
   postgres-data:
   es-data:
+  redis-data:

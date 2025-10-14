@@ -8,6 +8,8 @@ import com.scrable.bitirme.model.Product;
 import com.scrable.bitirme.repository.ProductRepo;
 import com.scrable.bitirme.repository.ProductSearchRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +28,7 @@ public class ProductService {
     private final ProductDocumentMapper productDocumentMapper;
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public ProductDto createProduct(ProductDto productDto, MultipartFile imageFile) {
         Product product = productDtoMapper.toEntity(productDto);
 
@@ -44,6 +47,7 @@ public class ProductService {
         return resultDto;
     }
 
+    @Cacheable("products")
     public List<ProductDto> getProducts() {
         return productRepo.findAll()
                 .stream()
@@ -56,6 +60,7 @@ public class ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public ProductDto updateProduct(Long id, ProductDto productDto, MultipartFile imageFile) {
         Product existingProduct = productRepo.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
@@ -84,6 +89,7 @@ public class ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(Long id) {
         Product productToDelete = productRepo.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
