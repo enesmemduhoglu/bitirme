@@ -28,6 +28,7 @@ public class CartService {
     private final CartRepo cartRepo;
     private final UserRepo userRepo;
     private final ProductRepo productRepo;
+    private final FileStorageService fileStorageService;
 
     public List<CartResponse> getCartByUserId(Long userId) {
         User user = userRepo.findById(userId)
@@ -42,7 +43,8 @@ public class CartService {
                     response.setQuantity(cart.getQuantity());
 
                     response.setProductName(cart.getProduct().getProductName());
-                    response.setProductImage(cart.getProduct().getProductImage());
+                    String presignedUrl = fileStorageService.generatePresignedUrl(cart.getProduct().getProductImage());
+                    response.setProductImage(presignedUrl);
                     response.setProductPrice(cart.getProduct().getProductPrice());
                     response.setProductDescription(cart.getProduct().getProductDescription());
 
@@ -108,6 +110,20 @@ public class CartService {
         int actualQuantityAdded = finalQuantity - currentQuantity;
 
         return new AddToCartResponse(message, actualQuantityAdded, product.getProductId());
+    }
+
+    @Transactional
+    public void removeProductFromCart(CartRequest cartRequest) {
+        User user = userRepo.findById(cartRequest.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + cartRequest.getUserId()));
+
+        Product product = productRepo.findById(cartRequest.getProductId())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + cartRequest.getProductId()));
+
+        Cart cartItem = cartRepo.findByUserAndProduct(user, product)
+                .orElseThrow(() -> new ProductNotFoundException("Cart item not found"));
+
+        cartRepo.delete(cartItem);
     }
 
 }

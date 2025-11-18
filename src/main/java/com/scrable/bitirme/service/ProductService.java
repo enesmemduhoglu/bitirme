@@ -88,6 +88,14 @@ public class ProductService {
         return resultDto;
     }
 
+    public ProductDto getProductById(Long id) {
+        Product product = productRepo.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
+
+        ProductDto dto = productDtoMapper.toDto(product);
+        return dto;
+    }
+
     @Transactional
     @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(Long id) {

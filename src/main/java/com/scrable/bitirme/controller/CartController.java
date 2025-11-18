@@ -29,4 +29,10 @@ public class CartController {
         return ResponseEntity.ok(cartItems);
     }
 
+    @DeleteMapping("/remove")
+    public ResponseEntity<Void> removeProductFromCart(@RequestBody CartRequest cartRequest) {
+        cartService.removeProductFromCart(cartRequest);
+        return ResponseEntity.ok().build();
+    }
+
 }

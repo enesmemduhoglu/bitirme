@@ -1,10 +1,16 @@
 package com.scrable.bitirme.dto;
 
 import com.scrable.bitirme.model.Product;
+import com.scrable.bitirme.service.FileStorageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ProductDtoMapper {
+
+    private final FileStorageService fileStorageService;
+
     public ProductDto toDto(Product product) {
         if (product == null) {
             return null;
@@ -16,7 +22,10 @@ public class ProductDtoMapper {
         productDto.setProductDescription(product.getProductDescription());
         productDto.setProductPrice(product.getProductPrice());
         productDto.setMaxQuantityPerCart(product.getMaxQuantityPerCart());
-        productDto.setProductImage(product.getProductImage());
+
+        String presignedUrl = fileStorageService.generatePresignedUrl(product.getProductImage());
+        productDto.setProductImage(presignedUrl);
+
         productDto.setProductStock(product.getProductStock());
 
         return productDto;
@@ -56,9 +65,9 @@ public class ProductDtoMapper {
         if (productDto.getMaxQuantityPerCart() != null) {
             product.setMaxQuantityPerCart(productDto.getMaxQuantityPerCart());
         }
-        if (productDto.getProductImage() != null) {
-            product.setProductImage(productDto.getProductImage());
-        }
+//        if (productDto.getProductImage() != null) {
+//            product.setProductImage(productDto.getProductImage());
+//        }
         if (productDto.getProductStock() != null) {
             product.setProductStock(productDto.getProductStock());
         }

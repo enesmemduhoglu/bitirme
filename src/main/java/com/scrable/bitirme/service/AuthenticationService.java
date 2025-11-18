@@ -48,6 +48,7 @@ public class AuthenticationService {
             throw new EmailAlreadyExistsException("Email already registered");
         }
 
+        //TODO: add stronger password validation (uppercase, numbers, special characters)
         if (request.getPassword().length() < 8) {
             throw new ResponseStatusException(BAD_REQUEST, "Password must be at least 8 characters");
         }
