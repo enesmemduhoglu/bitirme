@@ -10,6 +10,7 @@ import com.scrable.bitirme.exception.UserNotVerifiedException;
 import com.scrable.bitirme.repository.UserRepo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class AuthenticationService {
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
 
-
+    @Transactional
     public ResponseEntity<String> register(User request) {
         if (userRepo.findByUsername(request.getUsername()).isPresent()) {
             throw new ResponseStatusException(CONFLICT, "Username already exists");

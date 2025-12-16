@@ -47,9 +47,9 @@ public class SecurityConfig {
                                 .requestMatchers("/login/**", "/register/**", "/admin", "/refresh_token/**", "/verify/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/products", "/products/search", "/products/{id}").permitAll()
 
-                                .requestMatchers("/cart/**", "/orders/**", "/wishlist/**", "/payments/**").authenticated()
-
                                 .requestMatchers(HttpMethod.GET, "/orders").hasAuthority("ADMIN")
+
+                                .requestMatchers("/cart/**", "/orders/**", "/wishlist/**", "/payments/**").authenticated()
                                 .requestMatchers("/users", "/users/**").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/products").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/products/**").hasAuthority("ADMIN")
