@@ -90,4 +90,10 @@ public class OrderService {
                 .map(orderDtoMapper::convertToDto)
                 .collect(Collectors.toList());
     }
+
+    public List<OrderDto> getAllOrders() {
+        return orderRepo.findAll().stream()
+                .map(orderDtoMapper::convertToDto)
+                .collect(Collectors.toList());
+    }
 }
