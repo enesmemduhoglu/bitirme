@@ -8,4 +8,5 @@ import lombok.Setter;
 public class FinalizeOrderRequest {
     private Long userId;
     private String paymentIntentId;
+    private Long addressId;
 }

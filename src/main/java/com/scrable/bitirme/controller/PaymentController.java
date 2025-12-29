@@ -45,7 +45,8 @@ public class PaymentController {
     @PostMapping("/orders/finalize")
     public ResponseEntity<?> finalizeOrder(@RequestBody FinalizeOrderRequest finalizeOrderRequest) {
         try {
-            orderService.createOrderFromCart(finalizeOrderRequest.getUserId(), finalizeOrderRequest.getPaymentIntentId());
+            orderService.createOrderFromCart(finalizeOrderRequest.getUserId(),
+                    finalizeOrderRequest.getPaymentIntentId(), finalizeOrderRequest.getAddressId());
             return ResponseEntity.ok(Collections.singletonMap("message", "Order created successfully!"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -56,7 +57,8 @@ public class PaymentController {
     @PostMapping("/confirm-for-testing")
     public ResponseEntity<?> confirmPaymentForTesting(@RequestBody ConfirmPaymentRequest confirmPaymentRequest) {
         try {
-            PaymentIntent paymentIntent = paymentService.confirmPaymentIntentForTesting(confirmPaymentRequest.getPaymentIntentId());
+            PaymentIntent paymentIntent = paymentService
+                    .confirmPaymentIntentForTesting(confirmPaymentRequest.getPaymentIntentId());
             String status = paymentIntent.getStatus();
             return ResponseEntity.ok(Collections.singletonMap("status", status));
         } catch (StripeException e) {

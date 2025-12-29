@@ -35,4 +35,8 @@ public class Order {
     private String status;
 
     private String stripePaymentIntentId;
+
+    @ManyToOne
+    @JoinColumn(name = "shipping_address_id")
+    private Address shippingAddress;
 }

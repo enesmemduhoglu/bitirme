@@ -35,7 +35,8 @@ public class SecurityConfig {
     private final CustomLogoutHandler logoutHandler;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter)
+            throws Exception {
 
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -44,32 +45,36 @@ public class SecurityConfig {
                         req -> req
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                                .requestMatchers("/login/**", "/register/**", "/admin", "/refresh_token/**", "/verify/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/products", "/products/search", "/products/{id}").permitAll()
+                                .requestMatchers("/login/**", "/register/**", "/admin", "/refresh_token/**",
+                                        "/verify/**")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, "/products", "/products/search", "/products/{id}")
+                                .permitAll()
 
                                 .requestMatchers(HttpMethod.GET, "/orders").hasAuthority("ADMIN")
 
-                                .requestMatchers("/cart/**", "/orders/**", "/wishlist/**", "/payments/**").authenticated()
+                                .requestMatchers("/cart/**", "/orders/**", "/wishlist/**", "/payments/**",
+                                        "/address/**")
+                                .authenticated()
                                 .requestMatchers("/users", "/users/**").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/products").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/products/**").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/products/**").hasAuthority("ADMIN")
 
-                                .anyRequest().authenticated()
-                ).userDetailsService(userDetailsServiceImp)
+                                .anyRequest().authenticated())
+                .userDetailsService(userDetailsServiceImp)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(
                         e -> e.accessDeniedHandler(
-                                        (request, response, accessDeniedException) -> response.setStatus(403)
-                                )
+                                (request, response, accessDeniedException) -> response.setStatus(403))
                                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .logout(l -> l
                         .logoutUrl("/logout")
                         .addLogoutHandler(logoutHandler)
-                        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()
-                        ))
+                        .logoutSuccessHandler(
+                                (request, response, authentication) -> SecurityContextHolder.clearContext()))
                 .build();
     }
 

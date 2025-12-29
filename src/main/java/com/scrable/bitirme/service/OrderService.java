@@ -5,6 +5,7 @@ import com.scrable.bitirme.dto.OrderDtoMapper;
 import com.scrable.bitirme.exception.InsufficientStockException;
 import com.scrable.bitirme.exception.UserNotFoundException;
 import com.scrable.bitirme.model.*;
+import com.scrable.bitirme.repository.AddressRepo;
 import com.scrable.bitirme.repository.CartRepo;
 import com.scrable.bitirme.repository.OrderRepo;
 import com.scrable.bitirme.repository.ProductRepo;
@@ -24,12 +25,13 @@ public class OrderService {
 
     private final OrderRepo orderRepo;
     private final UserRepo userRepo;
+    private final AddressRepo addressRepo;
     private final CartRepo cartRepo;
     private final ProductRepo productRepo;
     private final OrderDtoMapper orderDtoMapper;
 
     @Transactional
-    public Order createOrderFromCart(Long userId, String paymentIntentId) {
+    public Order createOrderFromCart(Long userId, String paymentIntentId, Long addressId) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
 
@@ -39,8 +41,18 @@ public class OrderService {
             throw new IllegalStateException("Cannot create an order from an empty cart.");
         }
 
+        // Validate and fetch Address
+        Address shippingAddress = addressRepo.findById(addressId)
+                .orElseThrow(() -> new IllegalArgumentException("Address not found"));
+
+        // Security check: ensure address belongs to user
+        if (shippingAddress.getUser().getId() != userId) {
+            throw new IllegalArgumentException("Address does not belong to the user.");
+        }
+
         Order order = new Order();
         order.setUser(user);
+        order.setShippingAddress(shippingAddress);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus("COMPLETED");
         order.setStripePaymentIntentId(paymentIntentId);
@@ -50,7 +62,8 @@ public class OrderService {
             int requestedQuantity = cartItem.getQuantity();
 
             if (product.getProductStock() == null || product.getProductStock() < requestedQuantity) {
-                throw new InsufficientStockException("Insufficient stock for product: " + product.getProductName() + ". Requested: " + requestedQuantity + ", Available: " + product.getProductStock());
+                throw new InsufficientStockException("Insufficient stock for product: " + product.getProductName()
+                        + ". Requested: " + requestedQuantity + ", Available: " + product.getProductStock());
             }
 
             product.setProductStock(product.getProductStock() - requestedQuantity);

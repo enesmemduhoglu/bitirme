@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class PaymentRequest {
     private Long userId;
+    private Long addressId;
 }
