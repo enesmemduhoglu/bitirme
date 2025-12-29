@@ -7,7 +7,8 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # 2. Aşama: Run (Sadece oluşan JAR dosyasını çalıştır)
-FROM openjdk:17-jdk-slim
+# DEĞİŞİKLİK BURADA: openjdk yerine eclipse-temurin kullanıyoruz
+FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
